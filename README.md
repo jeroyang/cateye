@@ -21,6 +21,6 @@ $ python setup.py install
 from cateye import *
 ```
 ## License  
-* Free software: MIT license        
+* Free software: MIT license           
 
 TEST
