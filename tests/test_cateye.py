@@ -11,7 +11,7 @@ import unittest
 
 from cateye import cateye
 
-
+  
 class TestCateye(unittest.TestCase):
 
     def setUp(self):
