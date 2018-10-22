@@ -1,8 +1,10 @@
 # Cateye
 
-
+<!---
 [![](https://img.shields.io/travis/jeroyang/cateye.svg)](https://travis-ci.org/jeroyang/cateye)
 [![](https://img.shields.io/pypi/v/cateye.svg)](https://pypi.python.org/pypi/cateye)
+-->
+
 
 A hint enabled search engine for fixed-size documents
 
