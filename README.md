@@ -5,8 +5,7 @@
 [![](https://img.shields.io/pypi/v/cateye.svg)](https://pypi.python.org/pypi/cateye)
 -->
 
-
-A hint enabled search engine for fixed-size documents
+A Hint Enabled Search Engine Framework for Biomedical Classification Systems
 
 ## Features
 - Hint: Show hints for search terms which can fast narrow down the results
