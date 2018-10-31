@@ -4,6 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+flask = "*"
+shove = "*"
 
 [dev-packages]
 tox = "*"

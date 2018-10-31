@@ -1,0 +1,53 @@
+h1, h2{
+  font-family: sans-serif;
+}
+
+h3 {
+  margin: 0px;
+}
+
+h4 {
+  margin: 0px;
+  font-weight: normal;
+}
+
+input {
+  font-size: 1.2em;
+  width: 70%;
+}
+
+.result {
+  margin-top: 10px;
+}
+
+#hints.ul {
+ display: inline;
+}
+
+.list {
+  display: inline;
+  margin-right: 10px;
+}
+#count {
+  padding-left: 40px;
+}
+
+/* enable absolute positioning */
+.inner-addon {
+  position: relative;
+}
+
+/* style glyph */
+.inner-addon .glyphicon {
+  position: absolute;
+  padding: 10px;
+  pointer-events: none;
+}
+
+/* align glyph */
+.left-addon .glyphicon  { left:  0px;}
+.right-addon .glyphicon { right: 0px;}
+
+/* add padding  */
+.left-addon input  { padding-left:  30px; }
+.right-addon input { padding-right: 30px; }

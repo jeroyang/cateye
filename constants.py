@@ -4,7 +4,7 @@
 import string
 
 SITE_TITLE = 'Cateye'
-SITE_SUBTITLE = 'A hint enabled search engine'
+SITE_SUBTITLE = 'A hint-enabled search engine'
 
 TOKEN_FOLDER = 'data/token'
 SNIPPET_FOLDER = 'data/snippet'
@@ -13,13 +13,15 @@ HINT_FOLDER = 'data/hint'
 SPELLING_FILE = 'data/spelling.txt' # The formal spelling of tokens
 ABBREVIATION_FILE = 'data/abbrevation.txt'
 
+INDEX_URL = 'file://index'
+
 MAX_HINT_SMAPLING_SIZE = 100 # smaller size, faster system, less accurate hint
+MAX_RESULT = 10 # The upper limit of the showing results
 
 STOPCHARS = '之或及的型在與和併於，、,'
 
 STOPWORDS =  list(string.punctuation) + [ '',  ' ', 'and', 'at', 'as', 'by',
-            'for', 'due', 'from', 'in', 'into', 'of', 'or', 'other',
-            'specified', 'the', 'to', 'unspecified', 'using', 'via', 'with',
+            'for', 'due', 'from', 'in', 'into', 'of', 'or', 'the', 'to', 'using', 'via', 'with',
             '伴有']
 
 HINT_STOPWORDS =  STOPWORDS + [ 'cause', 'diseases', 'disorders', 'due',

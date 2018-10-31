@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{{ site_title }}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+      var $SCRIPT_ROOT = "";
+    </script>
+    <script type="text/javascript">
+      $(function() {
+        var submit_form = function(e, mode) {
+          $.getJSON($SCRIPT_ROOT + '/_search_' + mode, {
+            s: $('input[name=' + mode + ']').val(),
+          }, function(data) {
+            $('#response-' + mode).html(data);
+            $('input[name=' + mode + ']').focus().select();
+          });
+          return false;
+        };
+        $('input[name=query]').bind('keydown', function(e) {
+          var keyCode = e.keyCode || e.which;
+          switch (keyCode) {
+            case 9:
+              $('#to-pcs').click();
+              $('#pcs-box').select();
+              if (e.preventDefault) {
+                e.preventDefault();
+              } else {
+                e.returnValue = false;
+              }
+              break;
+            case 13:
+              submit_form(e, "query");
+              break;
+          }
+        });
+      });
+    </script>
+    <style media="screen">
+      body {
+        font-size: 1.7em;
+      }
+      .container {
+        padding-left: 40px;
+        padding-right: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>{{ site_title }}</h1>
+      <p>{{ site_subtitle }}</p>
+      <p style="text-align: right;">Powered by Cateye</p>
+      <div id="search">
+        <div class="inner-addon right-addon" style="margin-top: 15px;margin-bottom: 15px;">
+          <i class="glyphicon glyphicon-search"></i>
+          <input type="text" name="query" id="inputbox" class="form-control" placeholder="Search" />
+        </div>
+
+        <div class="response" id="response">
+          <!-- the response.html is inserted here-->
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+     $('#inputbox').on('change', function(e) {
+       $.get('/_search', {s: $(this).val()}, function(data) {
+         $('#response').html(data);
+       });
+       var data = '?s=' + $(this).val();
+       var href = window.location.protocol+'//'+window.location.hostname+(location.port ? ':'+window.location.port: '') + '/' + data;
+       history.pushState('', 'ICD10.name', href);
+     });
+     $(document).on('touchstart', function() {
+       documentClick = true;
+     });
+     $(document).on('touchmove', function() {
+       documentClick = false;
+     });
+     $(document).on('touchend click', '#response .hint a', function(e) {
+       e.stopPropagation();
+       e.preventDefault();
+       if (e.type == "click") documentClick = true;
+       if (documentClick) {
+         var query = $('#inputbox').val() + ' ' + $(this).text();
+         $('#inputbox').val(query);
+         $('#inputbox').trigger('change');
+       }
+     });
+     $(document).on('touchend click', 'h4.code a', function(e) {
+       e.stopPropagation();
+       e.preventDefault();
+       if (e.type == "click") documentClick = true;
+       if (documentClick) {
+         var query = $(this).text();
+         $('#inputbox').val(query);
+         $('#inputbox').trigger('change');
+       }
+     });
+     $(document).ready(function() {
+
+     });
+     $('#loadingDiv')
+       .hide()  // Hide it initially
+       .ajaxStart(function() {
+           $(this).show();
+       })
+       .ajaxStop(function() {
+           $(this).hide();
+       });
+     window.onpopstate = function(event) {
+       location.reload();
+     }
+   </script>
+  </body>
+</html>

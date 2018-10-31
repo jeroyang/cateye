@@ -3,6 +3,8 @@
 from setuptools import setup
 import sys
 import os
+from pipenv.project import Project
+from pipenv.utils import convert_deps_to_pip
 
 with open('README.md') as readme_file:
     readme = readme_file.read()
@@ -11,9 +13,9 @@ if sys.argv[-1] == 'publish':
     os.system("python setup.py sdist bdist_wheel upload")
     sys.exit()
 
-requirements = [
-    # TODO: put package requirements here
-]
+pfile = Project(chdir=False).parsed_pipfile
+requirements = convert_deps_to_pip(pfile['packages'], r=False)
+test_requirements = convert_deps_to_pip(pfile['dev-packages'], r=False)
 
 setup(
     name='cateye',

@@ -1,0 +1,70 @@
+<div class="ui-widget">
+  {% if abbr_log|length > 0 %}
+    <div id="abbreviations" class="ui-state-highlight ui-corner-all alert alert-success">
+      Abbreviation
+      <ul class="list-inline">
+          {% for correction in abbr_log -%}
+            <li class="abbreviation list"><strong>{{ correction[0]}}={{ correction[1] }}</strong></li>
+          {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if correct_log|length > 0 %}
+    <div id="corrections" class="ui-state-highlight ui-corner-all alert alert-success">
+      Correction
+      <ul class="list-inline">
+          {% for correction in correct_log -%}
+            <li class="correction list"><strong>{{ correction[0] }}={{ correction[1]}}</strong></li>
+          {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  {% if hints|length > 0 %}
+  <div id="hints" class="ui-state-highlight ui-corner-all alert alert-info">
+    Hint
+    <ul class="list-inline">
+      {% for hint in hints[:6] -%}
+      <li class="hint list"><a><strong>{{ hint }}</strong></a></li>
+      {%- endfor %}
+      {% for hint in hints[6:11] -%}
+      <li class="hint list visible-md-inline visible-lg-inline"><a><strong>{{ hint }}</strong></a></li>
+      {%- endfor %}
+      {% for hint in hints[11:] -%}
+      <li class="hint list visible-lg-inline"><a><strong>{{ hint }}</strong></a></li>
+      {%- endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>
+
+{% if fallback_log|length > 0 %}
+<div id="search-with" class="ui-state-highlight ui-corner-all alert alert-info">
+  Zero reuslt, searching with...
+  <ul class="list-inline">
+    {% for token in tokens -%}
+      <li class="tokens list"><strong>{{ token }}</strong></li>
+    {%- endfor %}
+  </ul>
+</div>
+{% endif %}
+</div>
+
+
+<div id="count">
+  <p><strong>{{ result_count }}</strong> result(s)</p>
+</div>
+
+{% if response|length > 0 %}
+  <div id=results>
+    <ol style="padding-left:35px;">
+      {% for code, snippet in response -%}
+      <li class="result">
+          <h4 class="code {{ db }}"><a>{{ code }}</a></h3>
+          <p class="name">{{ snippet }}</p>
+      </li>
+      {%- endfor %}
+    </ol>
+  </div>
+{% endif %}
