@@ -4,7 +4,8 @@
 import string
 
 SITE_TITLE = 'Cateye'
-SITE_SUBTITLE = 'A hint-enabled search engine'
+SITE_SUBTITLE = 'A hint-enabled search engine framework'
+
 
 TOKEN_FOLDER = 'data/token'
 SNIPPET_FOLDER = 'data/snippet'

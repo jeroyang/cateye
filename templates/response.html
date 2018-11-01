@@ -41,7 +41,10 @@
 
 {% if fallback_log|length > 0 %}
 <div id="search-with" class="ui-state-highlight ui-corner-all alert alert-info">
-  Zero reuslt, searching with...
+  Zero reuslt
+  {% if tokens|length > 0 %}
+  , searching with...
+  {% endif %}
   <ul class="list-inline">
     {% for token in tokens -%}
       <li class="tokens list"><strong>{{ token }}</strong></li>

@@ -35,7 +35,7 @@ The lemmatizing function will normalize your tokens. If you wish to build a case
 ### 2. Check the configuration.py:
 The configuration.py setups the paths of token_folder, index_url, snippet_folder, hint_folder, abbreviation_file, and spelling_correction_file.
 
-The index_url is used in the Shove object, which can be a remote URL starts with s3:// or a local URL starts with file:// please check the document of Shove.
+The index_url is used in the Shove object, which can be a remote URL starts with s3:// or a local URL starts with file:// please check the document of [Shove](https://pypi.org/project/shove/).
 
 ### 3. Build the index:
 Run command in the command line

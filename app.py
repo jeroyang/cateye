@@ -3,10 +3,11 @@
 
 from flask import Flask, jsonify, render_template, request
 import cateye
+from constants import *
 
 application = Flask(__name__)
 
-the_index = cateye.Shove('file://index')
+the_index = cateye.Shove(INDEX_URL)
 
 @application.route('/_search')
 def search():
@@ -25,9 +26,11 @@ def search():
 
 @application.route('/')
 def index():
+    s = request.args.get('s', '')
     return render_template('index.html',
                             site_title=cateye.SITE_TITLE,
-                            site_subtitle=cateye.SITE_SUBTITLE
+                            site_subtitle=cateye.SITE_SUBTITLE,
+                            query=s,
                             )
 
 if __name__ == '__main__':

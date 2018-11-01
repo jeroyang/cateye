@@ -12,27 +12,18 @@
     </script>
     <script type="text/javascript">
       $(function() {
-        var submit_form = function(e, mode) {
-          $.getJSON($SCRIPT_ROOT + '/_search_' + mode, {
-            s: $('input[name=' + mode + ']').val(),
+        var submit_form = function(e) {
+          $.getJSON($SCRIPT_ROOT + '/_search', {
+            s: $('input[name=query]').val(),
           }, function(data) {
-            $('#response-' + mode).html(data);
-            $('input[name=' + mode + ']').focus().select();
+            $('#response').html(data);
+            $('input[name=query]').focus().select();
           });
           return false;
         };
         $('input[name=query]').bind('keydown', function(e) {
           var keyCode = e.keyCode || e.which;
           switch (keyCode) {
-            case 9:
-              $('#to-pcs').click();
-              $('#pcs-box').select();
-              if (e.preventDefault) {
-                e.preventDefault();
-              } else {
-                e.returnValue = false;
-              }
-              break;
             case 13:
               submit_form(e, "query");
               break;
@@ -58,7 +49,7 @@
       <div id="search">
         <div class="inner-addon right-addon" style="margin-top: 15px;margin-bottom: 15px;">
           <i class="glyphicon glyphicon-search"></i>
-          <input type="text" name="query" id="inputbox" class="form-control" placeholder="Search" />
+          <input type="text" name="query" id="inputbox" class="form-control" placeholder="Search" value="{{ query }}" />
         </div>
 
         <div class="response" id="response">
@@ -68,12 +59,13 @@
     </div>
     <script type="text/javascript">
      $('#inputbox').on('change', function(e) {
+       document.title = $(this).val() + ' - {{ site_title }} ';
        $.get('/_search', {s: $(this).val()}, function(data) {
          $('#response').html(data);
        });
        var data = '?s=' + $(this).val();
        var href = window.location.protocol+'//'+window.location.hostname+(location.port ? ':'+window.location.port: '') + '/' + data;
-       history.pushState('', 'ICD10.name', href);
+       history.pushState('',  $(this).val() + ' - {{ site_title }} ', href);
      });
      $(document).on('touchstart', function() {
        documentClick = true;
@@ -91,6 +83,7 @@
          $('#inputbox').trigger('change');
        }
      });
+
      $(document).on('touchend click', 'h4.code a', function(e) {
        e.stopPropagation();
        e.preventDefault();
@@ -101,9 +94,17 @@
          $('#inputbox').trigger('change');
        }
      });
-     $(document).ready(function() {
 
+     $(document).ready(function() {
+       query = $('#inputbox').val();
+       if (query != '') {
+         document.title = query + ' - {{ site_title }} ';
+         $.get('/_search', {s: query}, function(data) {
+           $('#response').html(data);
+         });
+       }
      });
+
      $('#loadingDiv')
        .hide()  // Hide it initially
        .ajaxStart(function() {
