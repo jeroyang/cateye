@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 flask = "*"
 shove = "*"
+cateye = {editable = true, path = "."}
 
 [dev-packages]
 tox = "*"

@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cf16b63fc0fcbb41fa71bc2698e6c3bd87089b52b0678a13ac17570138cb20ec"
+            "sha256": "0873d0f701dc0e642c4d3a32876c91cfc5ea4eaf54d086678a29300e7b2bd30a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,12 +16,15 @@
         ]
     },
     "default": {
+        "cateye": {
+            "editable": true,
+            "path": "."
+        },
         "click": {
             "hashes": [
                 "sha256:2335065e6395b9e67ca716de5f7526736bfa6ceead690adf616d925bdc622b13",
                 "sha256:5b94b49521f6456670fdb30cd82a4eca9412788a93fa6dd6df72c94d5a8ff2d7"
             ],
-            "markers": "python_version != '3.0.*' and python_version != '3.3.*' and python_version != '3.1.*' and python_version >= '2.7' and python_version != '3.2.*'",
             "version": "==7.0"
         },
         "flask": {
@@ -44,7 +47,6 @@
                 "sha256:321b033d07f2a4136d3ec762eac9f16a10ccd60f53c0c91af90217ace7ba1f19",
                 "sha256:b12271b2047cb23eeb98c8b5622e2e5c5e9abd9784a153e9d8ef9cb4dd09d749"
             ],
-            "markers": "python_version >= '2.7' and python_version != '3.3.*' and python_version != '3.2.*' and python_version != '3.0.*' and python_version != '3.1.*'",
             "version": "==1.1.0"
         },
         "jinja2": {
@@ -193,7 +195,7 @@
             "hashes": [
                 "sha256:73f454e062ac149bafd262b18c1f9ebc91f53bd6474e028d1bf1c59ebd152efb"
             ],
-            "markers": "python_version < '3.7'",
+            "markers": "python_version != '3.0.*' and python_version != '3.2.*' and python_version != '3.1.*' and python_version >= '2.7' and python_version != '3.3.*'",
             "version": "==1.0.1"
         },
         "ipykernel": {

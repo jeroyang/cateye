@@ -33,6 +33,11 @@ setup(
     license="MIT",
     zip_safe=False,
     keywords='cateye',
+    entry_points = {
+        'console_scripts': [
+            'cateye = cateye.cateye:main'
+        ]
+    },
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',

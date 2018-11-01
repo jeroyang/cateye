@@ -228,10 +228,13 @@ abbr2long = load_abbr(abbr_file=ABBREVIATION_FILE)
 # Load spelling.txt
 term_freq = load_spelling(spell_file=SPELLING_FILE)
 
-if __name__ == '__main__':
+def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument("action", help="action")
     args = parser.parse_args()
     if args.action == 'buildindex':
         index = invert_index(TOKEN_FOLDER, INDEX_URL)
+
+if __name__ == '__main__':
+    main()
