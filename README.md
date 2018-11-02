@@ -14,12 +14,27 @@ A hint-enabled search engine framework for biomedical classification systems
 ## Installation
 
 ```bash
+$ git clone https://github.com/jeroyang/cateye.git
+$ cd cateye
 $ pip install -e .
 ```
 
 ## Usage
-### 1. Prepare your data:
 
+### 1. Run demo site:
+```bash
+$ FLASK_APP=app.py FLASK_ENV=development flask run
+```
+Then browse the local site http://127.0.0.1:5000/
+
+### 2. Make you own site:
+
+#### 2-1. Check the constants.py:
+Setup the essential variables in the constants.py:
+*SITE_TITLE, SITE_SUBTITLE, TOKEN_FOLDER, SNIPPET_FOLDER, HINT_FOLDER, SPELLING_FILE, ABBREVIATION_FILE, INDEX_URL*
+
+The *INDEX_URL* will be used in the Shove object, which can be a remote URL starts with s3:// or a local URL starts with file:// please check the document of [Shove](https://pypi.org/project/shove/).
+#### 2-2. Data preparing
 Folders overview:
   - *data:* The data source for the search engine, all information in this subfolders using the term id as their filenames
   - *data/token:* The tokens of the documents, after lemmatization
@@ -35,21 +50,16 @@ The tokenize function will be used in two places: the first place is to cut your
 
 The lemmatizing function will normalize your tokens. If you wish to build a case-insensitive search engine, you may use lowercase lemmatizer on the tokens.
 
-### 2. Check the configuration.py:
-The configuration.py setups the paths of *token_folder, index_url, snippet_folder, hint_folder, abbreviation_file,* and *spelling_correction_file*.
-
-The *index_url* is used in the Shove object, which can be a remote URL starts with s3:// or a local URL starts with file:// please check the document of [Shove](https://pypi.org/project/shove/).
-
-### 3. Build the index:
+#### 2-3. Build the index:
 Run the command in the command line
 ```bash
 $ cateye buildindex
 ```
 This command read the files in the *token_folder* and build an on-disk index in the *index_url*. It takes time depending on the size of your data
 
-### 4. Run the application:
+#### 2-4. Run your application:
 ```bash
-$ FLASK_APP=app.py flask run
+$ FLASK_APP=app.py FLASK_ENV=development flask run
 ```
 
 ## License
