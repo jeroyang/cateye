@@ -2,6 +2,8 @@
 
 A hint-enabled search engine framework for biomedical classification systems
 
+[![Build Status](https://travis-ci.org/jeroyang/cateye.svg?branch=master)](https://travis-ci.org/jeroyang/cateye)
+
 ## Features
 - Hint: Show hints for search terms which can fast narrow down the results
 - Automatic fallback: If no result satisfying the query, the system automatically eliminates less important search terms.
