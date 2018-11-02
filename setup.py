@@ -16,7 +16,7 @@ if sys.argv[-1] == 'publish':
 
 setup(
     name='cateye',
-    version='0.1.0',
+    version='0.1.1',
     description="A search engine for fixed documents including h hints",
     long_description=readme,
     long_description_content_type="text/markdown",
