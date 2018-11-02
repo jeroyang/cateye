@@ -60,9 +60,9 @@ def tokenize(s):
     tokens = [token for token in re.split(split_pattern, s) if not set(token) <= set(string.punctuation)]
     return tokens
 
-def lemmalize(tokens):
+def lemmatize(tokens):
     """
-    A simple lemalizer
+    A simple lemmatizer
     """
     return [token.lower() for token in tokens]
 
@@ -186,6 +186,9 @@ def abbr_expand(tokens):
     return output, log
 
 def _ed1(token):
+    """
+    Return tokens the edit distance of which is one from the given token
+    """
     insertion = {letter.join([token[:i], token[i:]]) for letter in string.ascii_lowercase for i in range(1, len(token) + 1)}
     deletion = {''.join([token[:i], token[i+1:]]) for i in range(1, len(token) + 1)}
     substitution = {letter.join([token[:i], token[i+1:]]) for letter in string.ascii_lowercase for i in range(1, len(token) + 1)}
@@ -193,9 +196,15 @@ def _ed1(token):
     return set.union(insertion, deletion, substitution, transposition)
 
 def _ed2(token):
+    """
+    Return tokens the edit distance of which is two from the given token
+    """
     return {e2 for e1 in _ed1(token) for e2 in _ed1(e1)}
 
 def _correct(token, term_freq):
+    """
+    Correct a single token according to the term_freq
+    """
     if token.lower() in term_freq:
         return token
     e1 = [t for t in _ed1(token) if t in term_freq]
@@ -209,6 +218,9 @@ def _correct(token, term_freq):
     return token
 
 def correct(tokens, term_freq):
+    """
+    Correct a list of tokens, according to the term_freq
+    """
     log = []
     output = []
     for token in tokens:
@@ -230,12 +242,14 @@ def result_sort_key(response_item):
     return len(snippet.split('\n')[0])
 
 def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
+    """
+    """
     fallback_log = []
     code_list = []
     tokens = tokenize(query)
     tokens, abbr_log = abbr_expand(tokens)
     tokens, correct_log = correct(tokens, term_freq)
-    tokens = lemmalize(tokens)
+    tokens = lemmatize(tokens)
     tokens = filterout(tokens)
     while len(tokens) > 0: # Fallback mechanism
         code_list = fetch(index, tokens)

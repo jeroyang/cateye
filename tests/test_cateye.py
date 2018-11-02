@@ -29,10 +29,10 @@ class TestCateye(unittest.TestCase):
         result = cateye.tokenize(s)
         self.assertEqual(wanted, result)
 
-    def test_lemmalize(self):
+    def test_lemmatize(self):
         tokens = ['Best', 'TEST', 'case']
         wanted= ['best', 'test', 'case']
-        result = cateye.lemmalize(tokens)
+        result = cateye.lemmatize(tokens)
         self.assertEqual(wanted, result)
 
     def test_filterout(self):
