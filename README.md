@@ -21,7 +21,7 @@ $ pip install -e .
 
 ## Usage
 
-### 1. Run demo site:
+### 1. Run the Demo Site:
 ```bash
 $ FLASK_APP=app.py FLASK_ENV=development flask run
 ```
