@@ -30,9 +30,18 @@ def load_spelling(spell_file=SPELLING_FILE):
     Load the term_freq from spell_file
     """
     with open(spell_file) as f:
-        tokens = f.read().split(' ')
-        term_freq = Counter(tokens)
+        tokens = f.read().split('\n')
+        size = len(tokens)
+        term_freq = {token: size - i for i, token in enumerate(tokens)}
     return term_freq
+
+
+# Load abbreviation.txt
+abbr2long = load_abbr(abbr_file=ABBREVIATION_FILE)
+
+# Load spelling.txt
+term_freq = load_spelling(spell_file=SPELLING_FILE)
+
 
 def gen_path(base, code):
     """
@@ -57,19 +66,20 @@ def lemmalize(tokens):
     """
     return [token.lower() for token in tokens]
 
-def filterout(tokens):
+def filterout(tokens, stopwords=STOPWORDS):
     """
     Filter removes stopwords
     """
-    return [token for token in tokens if token not in STOPWORDS]
+    return [token for token in tokens if token not in stopwords]
 
-def invert_index(source_dir, index_url=INDEX_URL):
+def invert_index(source_dir, index_url=INDEX_URL, init=False):
     """
     Build the invert index from give source_dir
     Output a Shove object built on the store_path
     Input:
         source_dir: a directory on the filesystem
         index_url: the store_path for the Shove object
+        init: clear the old index and rebuild from scratch
     Output:
         index: a Shove object
     """
@@ -83,9 +93,28 @@ def invert_index(source_dir, index_url=INDEX_URL):
                 for token in tokens:
                     raw_index[token].append(code)
     index = Shove(store=index_url)
+    if init:
+        index.clear()
     index.update(raw_index)
     index.sync()
     return index
+
+def write_spelling(token_folder, spelling_file):
+    """
+    Generate the spelling correction file form token_folder and save to spelling_file
+    """
+    token_pattern = r'[a-z]{3,}'
+    tokens = []
+    for base, dirlist, fnlist in os.walk(token_folder):
+        for fn in fnlist:
+            fp = os.path.join(base, fn)
+            with open(fp) as f:
+                toks = re.findall(token_pattern, f.read())
+                tokens.extend(toks)
+
+    token_ranked, _ = zip(*Counter(tokens).most_common())
+    with open(spelling_file, 'w') as f:
+        f.write('\n'.join(token_ranked))
 
 def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
     """
@@ -157,16 +186,16 @@ def abbr_expand(tokens):
     return output, log
 
 def _ed1(token):
-    insertion = {letter.join([token[:i], token[i:]]) for letter in string.ascii_lowercase for i in range(1, len(token))}
-    deletion = {''.join([token[:i], token[i+1:]]) for i in range(1, len(token))}
-    substitution = {letter.join([token[:i], token[i+1:]]) for letter in string.ascii_lowercase for i in range(1, len(token))}
+    insertion = {letter.join([token[:i], token[i:]]) for letter in string.ascii_lowercase for i in range(1, len(token) + 1)}
+    deletion = {''.join([token[:i], token[i+1:]]) for i in range(1, len(token) + 1)}
+    substitution = {letter.join([token[:i], token[i+1:]]) for letter in string.ascii_lowercase for i in range(1, len(token) + 1)}
     transposition = {''.join([token[:i], token[i+1:i+2],  token[i:i+1], token[i+2:]]) for i in range(1, len(token)-1)}
     return set.union(insertion, deletion, substitution, transposition)
 
 def _ed2(token):
     return {e2 for e1 in _ed1(token) for e2 in _ed1(e1)}
 
-def _correct(token):
+def _correct(token, term_freq):
     if token.lower() in term_freq:
         return token
     e1 = [t for t in _ed1(token) if t in term_freq]
@@ -179,11 +208,11 @@ def _correct(token):
         return e2[0]
     return token
 
-def correct(tokens):
+def correct(tokens, term_freq):
     log = []
     output = []
     for token in tokens:
-        corrected = _correct(token)
+        corrected = _correct(token, term_freq)
         if corrected != token:
             log.append((token, corrected))
         output.append(corrected)
@@ -200,12 +229,12 @@ def result_sort_key(response_item):
     code, snippet = response_item
     return len(snippet.split('\n')[0])
 
-def search(index, query, snippet_folder=SNIPPET_FOLDER):
+def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
     fallback_log = []
     code_list = []
     tokens = tokenize(query)
     tokens, abbr_log = abbr_expand(tokens)
-    tokens, correct_log = correct(tokens)
+    tokens, correct_log = correct(tokens, term_freq)
     tokens = lemmalize(tokens)
     tokens = filterout(tokens)
     while len(tokens) > 0: # Fallback mechanism
@@ -222,19 +251,15 @@ def search(index, query, snippet_folder=SNIPPET_FOLDER):
     return response, tokens, hints, hint_scores, \
            abbr_log, correct_log, fallback_log
 
-# Load abbreviation.txt
-abbr2long = load_abbr(abbr_file=ABBREVIATION_FILE)
-
-# Load spelling.txt
-term_freq = load_spelling(spell_file=SPELLING_FILE)
-
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", help="action")
+    parser.add_argument("action", help="buildindex")
+    parser.add_argument("-i", "--init", help="rebuild index after delete the old one")
     args = parser.parse_args()
     if args.action == 'buildindex':
         index = invert_index(TOKEN_FOLDER, INDEX_URL)
+        write_spelling(TOKEN_FOLDER, SPELLING_FILE)
 
 if __name__ == '__main__':
     main()

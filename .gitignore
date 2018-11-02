@@ -1,13 +1,15 @@
 # Too big
 *.pickle
 data/
+index/
+resource/
 
 # pyenv
 .python-version
 
 # ipython
 .ipynb_checkpoints
-# *.ipynb
+*.ipynb
 
 # OSX
 .DS_Store
