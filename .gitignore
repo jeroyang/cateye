@@ -1,8 +1,5 @@
 # Too big
 *.pickle
-data/
-index/
-resource/
 
 # pyenv
 .python-version
