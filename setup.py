@@ -11,13 +11,14 @@ with open('requirements.txt') as f:
     requirements = f.read().splitlines()
 
 if sys.argv[-1] == 'publish':
-    os.system("python setup.py sdist bdist_wheel upload")
+    os.system("python setup.py sdist bdist_wheel")
+    os.system("twine upload dist/*")
     sys.exit()
 
 setup(
     name='cateye',
     version='0.1.1',
-    description="A search engine for fixed documents including h hints",
+    description="A hint-enabled search engine framework for biomedical classification systems",
     long_description=readme,
     long_description_content_type="text/markdown",
     author="Chia-Jung, Yang",
