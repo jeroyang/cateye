@@ -10,6 +10,7 @@ A hint-enabled search engine framework for biomedical classification systems
 - Fallback: If no result satisfying the query, the system automatically eliminates less important search terms.
 - Spelling correction: Build-in spelling correction for query terms.
 - Abbreviation expansion: Pre-defined abbreviation list will be automatically applied during the search
+- Sorted results: Sort the results according to the search history.
 
 ## Installation
 
@@ -54,7 +55,7 @@ The lemmatizing function will normalize your tokens. If you wish to build a case
 #### 2-3. Build the index:
 Run the command in the command line
 ```bash
-$ cateye buildindex
+$ cateye newindex
 ```
 This command read the files in the *token_folder* and build an on-disk index in the *index_url*. It takes time depending on the size of your data.
 

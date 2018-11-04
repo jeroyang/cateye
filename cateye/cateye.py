@@ -6,6 +6,7 @@ import sys
 sys.path.append(os.getcwd())
 import string
 import random
+import json
 
 from collections import defaultdict, Counter
 from shove import Shove
@@ -35,6 +36,12 @@ def load_spelling(spell_file=SPELLING_FILE):
         term_freq = {token: size - i for i, token in enumerate(tokens)}
     return term_freq
 
+def load_search_freq(fp=SEARCH_FREQ_JSON):
+    """
+    Load the search_freq from JSON file
+    """
+    with open(fp) as f:
+        return Counter(json.load(f))
 
 # Load abbreviation.txt
 abbr2long = load_abbr(abbr_file=ABBREVIATION_FILE)
@@ -42,6 +49,8 @@ abbr2long = load_abbr(abbr_file=ABBREVIATION_FILE)
 # Load spelling.txt
 term_freq = load_spelling(spell_file=SPELLING_FILE)
 
+# Load search_freq
+search_freq = load_search_freq(SEARCH_FREQ_JSON)
 
 def gen_path(base, code):
     """
@@ -236,13 +245,20 @@ def result_sort_key(response_item):
     Input:
         response_item: the tuple of (code, snippet)
     output:
-        sortable value, the smallest first
+        sortable value, the greatest first
     """
     code, snippet = response_item
-    return len(snippet.split('\n')[0])
+
+    snippet_length = len(snippet)
+    freq = search_freq.get(code, 0)
+    beta = 0.05
+    score = (1 + freq * 0.05) / snippet_length
+
+    return score
 
 def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
     """
+    The highest level of search function
     """
     fallback_log = []
     code_list = []
@@ -261,18 +277,29 @@ def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
     snippets = get_snippets(code_list, snippet_folder)
     hints, hint_scores = get_hints(code_list, current_tokens=tokens)
     response = list(zip(code_list, snippets))
-    response.sort(key=result_sort_key)
+    response.sort(key=result_sort_key, reverse=True)
+
+    # Count search_frequency
+    if len(response) <= MAX_RESULT: # the respone can be shown in one page
+        search_freq.update(code_list)
+        with open(SEARCH_FREQ_JSON, 'w') as f:
+            json.dump(search_freq, f, indent=2)
+
     return response, tokens, hints, hint_scores, \
            abbr_log, correct_log, fallback_log
 
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", help="buildindex")
-    parser.add_argument("-i", "--init", help="rebuild index after delete the old one")
+    parser.add_argument("action", help="`newindex` or `updateindex`")
     args = parser.parse_args()
-    if args.action == 'buildindex':
-        index = invert_index(TOKEN_FOLDER, INDEX_URL)
+    if args.action == 'newindex':
+        init = True
+        index = invert_index(TOKEN_FOLDER, INDEX_URL, init=init)
+        write_spelling(TOKEN_FOLDER, SPELLING_FILE)
+    elif args.action == 'updateindex':
+        init = False
+        index = invert_index(TOKEN_FOLDER, INDEX_URL, init=init)
         write_spelling(TOKEN_FOLDER, SPELLING_FILE)
 
 if __name__ == '__main__':
