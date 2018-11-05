@@ -12,6 +12,8 @@ from collections import defaultdict, Counter
 from shove import Shove
 from constants import *
 
+import logging
+
 def load_abbr(abbr_file=ABBREVIATION_FILE):
     """
     Load the abbr2long from file
@@ -40,8 +42,11 @@ def load_search_freq(fp=SEARCH_FREQ_JSON):
     """
     Load the search_freq from JSON file
     """
-    with open(fp) as f:
-        return Counter(json.load(f))
+    try:
+        with open(fp) as f:
+            return Counter(json.load(f))
+    except FileNotFoundError:
+        return {}
 
 # Load abbreviation.txt
 abbr2long = load_abbr(abbr_file=ABBREVIATION_FILE)
@@ -135,6 +140,7 @@ def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
         The formula for hint score
         """
         return 1.0 - abs(v / (size + 1) - 0.5)
+
     if len(code_list) <= 1:
         return [], []
 
@@ -149,10 +155,13 @@ def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
     for code in sample:
         path = gen_path(hint_folder, code)
         fp = os.path.join(path, code)
-        with open(fp) as f:
-            hints = set(f.read().strip().split('\n'))
-            hint_list.extend([h.lower() for h in hints])
-            capital_dict.update({hint.lower(): hint for hint in hints})
+        try:
+            with open(fp) as f:
+                hints = set(f.read().strip().split('\n'))
+                hint_list.extend([h.lower() for h in hints])
+                capital_dict.update({hint.lower(): hint for hint in hints})
+        except FileNotFoundError:
+            logging.warning("FileNotFoundError: No such file: %r" % fp )
     document_freq = Counter(hint_list)
     score = [(capital_dict[k], hint_score(v, size)) \
              for k, v in document_freq.items() if k not in current_tokens]
@@ -178,8 +187,13 @@ def get_snippets(code_list, base=SNIPPET_FOLDER):
     for code in code_list:
         path = gen_path(base, code)
         fp = os.path.join(path, code)
-        with open(fp) as f:
-            output.append(f.read())
+        try:
+            with open(fp) as f:
+                output.append(f.read())
+        except FileNotFoundError:
+            output.append('')
+            logging.warning("FileNotFoundError: No such file: %r" % fp )
+
     return output
 
 def abbr_expand(tokens):
@@ -252,7 +266,7 @@ def result_sort_key(response_item):
     snippet_length = len(snippet)
     freq = search_freq.get(code, 0)
     beta = 0.05
-    score = (1 + freq * 0.05) / snippet_length
+    score = (freq * 0.05 + 1) / (snippet_length + 1)
 
     return score
 
