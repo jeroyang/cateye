@@ -46,7 +46,7 @@ Folders overview:
   - *data/abbreviation.txt:* The abbreviations, one line for one abbreviation pair, using tab to separate the short form and long form
 
 Cateye include some very basic text processing tools:
-tokenizer (basic_functions.tokenize) and lemmatizer (basic_functions.lemmatize)
+tokenizer (cateye.tokenize) and lemmatizer (cateye.lemmatize)
 
 The tokenize function will be used in two places: the first place is to cut your documents into tokens, and the second place is to cut your query into tokens.
 
