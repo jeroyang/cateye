@@ -3,16 +3,16 @@
 import os
 import re
 import sys
-sys.path.append(os.getcwd())
+import math
+import logging
 import string
 import random
 import json
-
 from collections import defaultdict, Counter
 from shove import Shove
-from constants import *
 
-import logging
+sys.path.append(os.getcwd())
+from constants import *
 
 def load_abbr(abbr_file=ABBREVIATION_FILE):
     """
@@ -46,7 +46,7 @@ def load_search_freq(fp=SEARCH_FREQ_JSON):
         with open(fp) as f:
             return Counter(json.load(f))
     except FileNotFoundError:
-        return {}
+        return Counter()
 
 # Load abbreviation.txt
 abbr2long = load_abbr(abbr_file=ABBREVIATION_FILE)
@@ -266,7 +266,7 @@ def result_sort_key(response_item):
     snippet_length = len(snippet)
     freq = search_freq.get(code, 0)
     beta = 0.05
-    score = (freq * 0.05 + 1) / (snippet_length + 1)
+    score = math.log(freq * 0.05 + 1) / (snippet_length + 1)
 
     return score
 
