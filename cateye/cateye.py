@@ -63,6 +63,12 @@ def gen_path(base, code):
     """
     return os.path.join(base, code[:2], code[:3])
 
+def clean(s):
+    output = re.sub(r'without .*?(,|$)', '', s)
+    if s != output:
+        print(s)
+    return output
+
 def tokenize(s):
     """
     A simple tokneizer

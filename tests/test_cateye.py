@@ -23,6 +23,17 @@ class TestCateye(unittest.TestCase):
         result = cateye.gen_path(base, code)
         self.assertEqual(wanted, result)
 
+    def test_clean(self):
+        s = 'Open wound to auricle of ear, without mention of complication'
+        wanted = 'Open wound to auricle of ear, '
+        result = cateye.clean(s)
+        self.assertEqual(wanted, result)
+        s = 'Diabetes mellitus without mention of complication, Type I'
+        wanted = 'Diabetes mellitus  Type I'
+        result = cateye.clean(s)
+        self.assertEqual(wanted, result)
+
+
     def test_tokenize(self):
         s = "Crohn's disease 克隆氏症"
         wanted = ['Crohn', 'disease', '克隆氏症']
