@@ -61,12 +61,11 @@ def gen_path(base, code):
     """
     Generate a path for give base path and code used in data generation
     """
-    return os.path.join(base, code[:2], code[:3])
+    #return os.path.join(base, code[:2], code[:3])
+    return os.path.join(base)
 
 def clean(s):
     output = re.sub(r'without .*?(,|$)', '', s)
-    if s != output:
-        print(s)
     return output
 
 def tokenize(s):
@@ -76,7 +75,7 @@ def tokenize(s):
     s = re.sub(r'(?a)(\w+)\'s', r'\1', s) # clean the 's from Crohn's disease
     #s = re.sub(r'(?a)\b', ' ', s) # split the borders of chinese and english chars
 
-    split_pattern = r'[{} ]+'.format(STOPCHARS)
+    split_pattern = r'[{} ]+'.format(re.escape(STOPCHARS))
     tokens = [token for token in re.split(split_pattern, s) if not set(token) <= set(string.punctuation)]
     return tokens
 
