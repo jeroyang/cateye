@@ -19,7 +19,7 @@ class TestCateye(unittest.TestCase):
     def test_gen_path(self):
         base = 'test/path'
         code = 'ABC3'
-        wanted = 'test/path/AB/ABC'
+        wanted = 'test/path'
         result = cateye.gen_path(base, code)
         self.assertEqual(wanted, result)
 

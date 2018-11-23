@@ -62,10 +62,12 @@ def gen_path(base, code):
     Generate a path for give base path and code used in data generation
     """
     #return os.path.join(base, code[:2], code[:3])
-    return os.path.join(base)
+    return base
 
 def clean(s):
     output = re.sub(r'without .*?(,|$)', '', s)
+    if s != output:
+        print(s)
     return output
 
 def tokenize(s):
