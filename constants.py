@@ -19,7 +19,7 @@ INDEX_URL = 'file://index'
 MAX_HINT_SMAPLING_SIZE = 100 # smaller the size, faster the system, less accurate hint
 MAX_RESULT = 10 # The upper limit of the showing results
 
-STOPCHARS = '之或及的型在與和併於，、,'
+STOPCHARS = '之或及的型在與和併於，、,[]()﹝﹞'
 
 STOPWORDS =  list(string.punctuation) + [ '',  ' ', 'and', 'at', 'as', 'by',
             'for', 'due', 'from', 'in', 'into', 'of', 'or', 'the', 'to',
