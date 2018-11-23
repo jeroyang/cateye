@@ -66,8 +66,6 @@ def gen_path(base, code):
 
 def clean(s):
     output = re.sub(r'without .*?(,|$)', '', s)
-    if s != output:
-        print(s)
     return output
 
 def tokenize(s):
