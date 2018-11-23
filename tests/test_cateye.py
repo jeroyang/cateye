@@ -30,9 +30,6 @@ class TestCateye(unittest.TestCase):
         self.assertEqual(wanted, result)
         s = 'Diabetes mellitus without mention of complication, Type I'
         wanted = 'Diabetes mellitus  Type I'
-        result = cateye.clean(s)
-        self.assertEqual(wanted, result)
-
 
     def test_tokenize(self):
         s = "Crohn's disease 克隆氏症"

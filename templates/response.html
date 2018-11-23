@@ -64,8 +64,7 @@
     <ol style="padding-left:35px;">
       {% for code, snippet in response -%}
       <li class="result">
-          <h4 class="code {{ db }}"><a>{{ code }}</a></h3>
-          <p class="name">{{ snippet|safe }}</p>
+        {{ snippet|safe }}
       </li>
       {%- endfor %}
     </ol>
