@@ -20,6 +20,7 @@ data/search_freq.json
 *.so
 
 # Packages
+.eggs
 *.egg
 *.egg-info
 dist
