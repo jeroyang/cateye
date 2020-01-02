@@ -27,6 +27,7 @@ $ pip install -e .
 $ FLASK_APP=app.py FLASK_ENV=development flask run
 ```
 Then browse the local site http://127.0.0.1:5000/
+Try to search "rhinitis"
 
 ### 2. Make your own site:
 
