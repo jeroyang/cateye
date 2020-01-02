@@ -38,6 +38,7 @@ def load_spelling(spell_file=SPELLING_FILE):
         term_freq = {token: size - i for i, token in enumerate(tokens)}
     return term_freq
 
+
 def load_search_freq(fp=SEARCH_FREQ_JSON):
     """
     Load the search_freq from JSON file
@@ -47,6 +48,7 @@ def load_search_freq(fp=SEARCH_FREQ_JSON):
             return Counter(json.load(f))
     except FileNotFoundError:
         return Counter()
+
 
 # Load abbreviation.txt
 abbr2long = load_abbr(abbr_file=ABBREVIATION_FILE)
@@ -64,9 +66,11 @@ def gen_path(base, code):
     #return os.path.join(base, code[:2], code[:3])
     return base
 
+
 def clean(s):
     output = re.sub(r'without .*?(,|$)', '', s)
     return output
+
 
 def tokenize(s):
     """
@@ -79,17 +83,20 @@ def tokenize(s):
     tokens = [token for token in re.split(split_pattern, s) if not set(token) <= set(string.punctuation)]
     return tokens
 
+
 def lemmatize(tokens):
     """
     A simple lemmatizer
     """
     return [token.lower() for token in tokens]
 
+
 def filterout(tokens, stopwords=STOPWORDS):
     """
     Filter removes stopwords
     """
     return [token for token in tokens if token not in stopwords]
+
 
 def invert_index(source_dir, index_url=INDEX_URL, init=False):
     """
@@ -108,15 +115,22 @@ def invert_index(source_dir, index_url=INDEX_URL, init=False):
             fp = os.path.join(base, fn)
             code = fn
             with open(fp) as f:
-                tokens = f.read().strip().split('\n')
+                try:
+                    tokens = f.read().strip().split('\n')
+                except:
+                    print(fp)
+                    continue
                 for token in tokens:
                     raw_index[token].append(code)
     index = Shove(store=index_url)
     if init:
         index.clear()
+    if '' in raw_index:
+        del raw_index['']
     index.update(raw_index)
     index.sync()
     return index
+
 
 def write_spelling(token_folder, spelling_file):
     """
@@ -128,8 +142,11 @@ def write_spelling(token_folder, spelling_file):
         for fn in fnlist:
             fp = os.path.join(base, fn)
             with open(fp) as f:
-                toks = re.findall(token_pattern, f.read())
-                tokens.extend(toks)
+                try:
+                    toks = re.findall(token_pattern, f.read())
+                    tokens.extend(toks)
+                except:
+                    print(fp)
 
     token_ranked, _ = zip(*Counter(tokens).most_common())
     with open(spelling_file, 'w') as f:
@@ -144,6 +161,8 @@ def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
         """
         The formula for hint score
         """
+        if v == size:
+            return 0
         return 1.0 - abs(v / (size + 1) - 0.5)
 
     if len(code_list) <= 1:
@@ -173,6 +192,7 @@ def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
     if len(score) == 0:
         return [], []
     score.sort(key=lambda x: x[1], reverse=True)
+
     hints, scores = tuple(list(zip(*score[:k])))
     return hints, scores
 
@@ -183,6 +203,7 @@ def fetch(index, tokens):
     if len(tokens) == 0:
         return set()
     return set.intersection(*[set(index.get(token, [])) for token in tokens])
+
 
 def get_snippets(code_list, base=SNIPPET_FOLDER):
     """
@@ -201,6 +222,7 @@ def get_snippets(code_list, base=SNIPPET_FOLDER):
 
     return output
 
+
 def abbr_expand(tokens):
     log = []
     output = []
@@ -213,6 +235,7 @@ def abbr_expand(tokens):
             output.append(token)
     return output, log
 
+
 def _ed1(token):
     """
     Return tokens the edit distance of which is one from the given token
@@ -223,11 +246,13 @@ def _ed1(token):
     transposition = {''.join([token[:i], token[i+1:i+2],  token[i:i+1], token[i+2:]]) for i in range(1, len(token)-1)}
     return set.union(insertion, deletion, substitution, transposition)
 
+
 def _ed2(token):
     """
     Return tokens the edit distance of which is two from the given token
     """
     return {e2 for e1 in _ed1(token) for e2 in _ed1(e1)}
+
 
 def _correct(token, term_freq):
     """
@@ -245,6 +270,7 @@ def _correct(token, term_freq):
         return e2[0]
     return token
 
+
 def correct(tokens, term_freq):
     """
     Correct a list of tokens, according to the term_freq
@@ -257,6 +283,7 @@ def correct(tokens, term_freq):
             log.append((token, corrected))
         output.append(corrected)
     return output, log
+
 
 def result_sort_key(response_item):
     """
@@ -271,9 +298,10 @@ def result_sort_key(response_item):
     snippet_length = len(snippet)
     freq = search_freq.get(code, 0)
     beta = 0.05
-    score = math.log(freq * 0.05 + 1) / (snippet_length + 1)
+    score = len(code) - math.log(snippet_length) + math.log(freq * 0.05 + 1)
 
     return score
+
 
 def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
     """
@@ -281,7 +309,7 @@ def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
     """
     fallback_log = []
     code_list = []
-    tokens = tokenize(query)
+    tokens = lemmatize(tokenize(query))
     tokens, abbr_log = abbr_expand(tokens)
     tokens, correct_log = correct(tokens, term_freq)
     tokens = lemmatize(tokens)
@@ -306,6 +334,7 @@ def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
 
     return response, tokens, hints, hint_scores, \
            abbr_log, correct_log, fallback_log
+           
 
 def main():
     import argparse
