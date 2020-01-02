@@ -34,7 +34,7 @@ Then browse the local site http://127.0.0.1:5000/
 Setup the essential variables in the constants.py:
 *SITE_TITLE, SITE_SUBTITLE, TOKEN_FOLDER, SNIPPET_FOLDER, HINT_FOLDER, SPELLING_FILE, ABBREVIATION_FILE, INDEX_URL*
 
-The *INDEX_URL* will be used in the Shove object, which can be a remote URL starts with s3:// or a local URL starts with file:// please check the document of [Shove](https://pypi.org/project/shove/).
+The *INDEX_URL* will be used in the Shove object, which can be a local URL starts with file:// please check the document of [Shove](https://pypi.org/project/shove/).
 
 #### 2-2. Data preparing
 Folders overview:
