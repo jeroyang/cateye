@@ -22,7 +22,7 @@ def load_abbr(abbr_file=ABBREVIATION_FILE):
     Load the abbr2long from file
     """
     abbr2long = dict()
-    with open(abbr_file) as f:
+    with open(abbr_file, encoding="utf-8") as f:
         lines = f.read().split('\n')
         for line in lines:
             m = re.match(r'(\w+)\t(.+)', line)
@@ -35,7 +35,7 @@ def load_spelling(spell_file=SPELLING_FILE):
     """
     Load the term_freq from spell_file
     """
-    with open(spell_file) as f:
+    with open(spell_file, encoding="utf-8") as f:
         tokens = f.read().split('\n')
         size = len(tokens)
         term_freq = {token: size - i for i, token in enumerate(tokens)}
@@ -47,7 +47,7 @@ def load_search_freq(fp=SEARCH_FREQ_JSON):
     Load the search_freq from JSON file
     """
     try:
-        with open(fp) as f:
+        with open(fp, encoding="utf-8") as f:
             return Counter(json.load(f))
     except FileNotFoundError:
         return Counter()
@@ -115,7 +115,7 @@ def invert_index(source_dir, index_url=INDEX_URL, init=False):
         for fn in fn_list:
             fp = os.path.join(base, fn)
             code = fn
-            with open(fp) as f:
+            with open(fp, encoding="utf-8") as f:
                 try:
                     tokens = f.read().strip().split('\n')
                 except:
@@ -141,11 +141,11 @@ def write_spelling(token_folder, spelling_file):
     for base, dirlist, fnlist in os.walk(token_folder):
         for fn in fnlist:
             fp = os.path.join(base, fn)
-            with open(fp) as f:
+            with open(fp, encoding="utf-8") as f:
                 tokens.extend(f.read().split('\n'))
 
     token_ranked, _ = zip(*Counter(tokens).most_common())
-    with open(spelling_file, 'w') as f:
+    with open(spelling_file, 'w', encoding="utf-8") as f:
         f.write('\n'.join(token_ranked))
 
 
@@ -177,7 +177,7 @@ def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
         path = gen_path(hint_folder, code)
         fp = os.path.join(path, code)
         try:
-            with open(fp) as f:
+            with open(fp, encoding="utf-8") as f:
                 hints = set(f.read().strip().split('\n'))
                 hint_list.extend([h.lower() for h in hints])
                 capital_dict.update({hint.lower(): hint for hint in hints})
@@ -210,7 +210,7 @@ def _get_snippet(code, base):
     path = gen_path(base, code)
     fp = os.path.join(path, code)
     try:
-        with open(fp) as f:
+        with open(fp, encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
         output.append('')
@@ -344,7 +344,7 @@ def search(index, query, term_freq,
     # Count search_frequency
     if len(response) <= MAX_RESULT: # the respone can be shown in one page
         search_freq.update(code_list)
-        with open(SEARCH_FREQ_JSON, 'w') as f:
+        with open(SEARCH_FREQ_JSON, 'w', encoding="utf-8") as f:
             json.dump(search_freq, f, indent=2)
 
     return response, tokens, hints, hint_scores, \
