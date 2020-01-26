@@ -1,5 +1,4 @@
 acute
-other
 unspecified
 respiratory
 pneumonia
@@ -138,6 +137,7 @@ hypertrophy
 whether
 effusion
 polyp
+induced
 inhalation
 j21
 j21.
@@ -171,6 +171,7 @@ dusts
 organic
 syncytial
 j35.0
+associated
 air
 j45.3
 j10.0
@@ -178,6 +179,7 @@ j38.0
 paralysis
 intraoperative
 j96.9
+drug
 drug-induced
 obstruction
 frontal
@@ -234,6 +236,7 @@ viral
 syndrome
 unilateral
 j01.3
+specific
 condition
 cell
 aureus
@@ -278,7 +281,6 @@ plaque
 bronchospasm
 disorder
 asbestos
-associated
 simple
 adenoiditis
 mycoplasma
@@ -339,13 +341,14 @@ coxsackievirus
 j20.3
 j01.31
 j81.1
+dressers'
+flax
 flax-dressers'
 j66.1
 j47.0
 j11.08
 airway
 j66.8
-specific
 j47.9
 j84.17
 j01.90
@@ -375,6 +378,7 @@ j43.8
 j35.01
 coronavirus
 j12.81
+sars
 sars-associated
 coli
 escherichia
@@ -456,10 +460,13 @@ suberosis
 j67.4
 maltworker
 j84.113
+non
 non-specific
 j44.1
 j45.40
+esophageal
 j95.04
+tracheo
 tracheo-esophageal
 j10.83
 j95.03
@@ -478,7 +485,9 @@ j95.61
 j44.0
 j44.9
 j67.5
+mushroom
 mushroom-worker
+worker
 j84.112
 j95.830
 j84.115
@@ -613,8 +622,10 @@ j45.998
 j15.212
 resistant
 aerobic
+gram
 gram-negative
 j15.6
+negative
 j95.811
 j95.71
 cough
@@ -640,7 +651,6 @@ agents
 j70.8
 j45.51
 exercise
-induced
 j45.990
 j95.821
 j93.0
@@ -651,7 +661,9 @@ j96.92
 j15.7
 injury
 j95.84
+related
 trali
+transfusion
 transfusion-related
 j93.9
 cyst
@@ -715,8 +727,11 @@ organizing
 bagassosis
 j67.1
 j04.2
+bark
 j67.6
+maple
 maple-bark-stripper
+stripper
 j84.111
 otherwise
 j04.10
@@ -739,6 +754,7 @@ coalworker
 j60
 j37.0
 j84.09
+parieto
 parieto-alveolar
 j35.3
 j98.5
