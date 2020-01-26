@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
 import re
@@ -9,7 +8,11 @@ import string
 import random
 import json
 from collections import defaultdict, Counter
+from functools import lru_cache
 from shove import Shove
+
+import jinja2
+
 
 sys.path.append(os.getcwd())
 from constants import *
@@ -53,9 +56,6 @@ def load_search_freq(fp=SEARCH_FREQ_JSON):
 # Load abbreviation.txt
 abbr2long = load_abbr(abbr_file=ABBREVIATION_FILE)
 
-# Load spelling.txt
-term_freq = load_spelling(spell_file=SPELLING_FILE)
-
 # Load search_freq
 search_freq = load_search_freq(SEARCH_FREQ_JSON)
 
@@ -81,6 +81,7 @@ def tokenize(s):
 
     split_pattern = r'[{} ]+'.format(re.escape(STOPCHARS))
     tokens = [token for token in re.split(split_pattern, s) if not set(token) <= set(string.punctuation)]
+    tokens.extend([unit for tk in tokens if '-' in tk for unit in tk.split('-')])
     return tokens
 
 
@@ -136,21 +137,17 @@ def write_spelling(token_folder, spelling_file):
     """
     Generate the spelling correction file form token_folder and save to spelling_file
     """
-    token_pattern = r'[a-z]{3,}'
     tokens = []
     for base, dirlist, fnlist in os.walk(token_folder):
         for fn in fnlist:
             fp = os.path.join(base, fn)
             with open(fp) as f:
-                try:
-                    toks = re.findall(token_pattern, f.read())
-                    tokens.extend(toks)
-                except:
-                    print(fp)
+                tokens.extend(f.read().split('\n'))
 
     token_ranked, _ = zip(*Counter(tokens).most_common())
     with open(spelling_file, 'w') as f:
         f.write('\n'.join(token_ranked))
+
 
 def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
     """
@@ -161,7 +158,7 @@ def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
         """
         The formula for hint score
         """
-        if v == size:
+        if v == size or v == 0:
             return 0
         return 1.0 - abs(v / (size + 1) - 0.5)
 
@@ -187,8 +184,12 @@ def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
         except FileNotFoundError:
             logging.warning("FileNotFoundError: No such file: %r" % fp )
     document_freq = Counter(hint_list)
-    score = [(capital_dict[k], hint_score(v, size)) \
-             for k, v in document_freq.items() if k not in current_tokens]
+    score = []
+    for k_, v in document_freq.items():
+        _score = hint_score(v, size)
+        if k_ not in current_tokens and _score > 0:
+            score.append((capital_dict[k_], _score))
+
     if len(score) == 0:
         return [], []
     score.sort(key=lambda x: x[1], reverse=True)
@@ -204,22 +205,24 @@ def fetch(index, tokens):
         return set()
     return set.intersection(*[set(index.get(token, [])) for token in tokens])
 
+@lru_cache(maxsize=65536)
+def _get_snippet(code, base):
+    path = gen_path(base, code)
+    fp = os.path.join(path, code)
+    try:
+        with open(fp) as f:
+            return f.read()
+    except FileNotFoundError:
+        output.append('')
+        logging.warning("FileNotFoundError: No such file: %r" % fp )
+        return ''
+
 
 def get_snippets(code_list, base=SNIPPET_FOLDER):
     """
     Get the snippets
     """
-    output = []
-    for code in code_list:
-        path = gen_path(base, code)
-        fp = os.path.join(path, code)
-        try:
-            with open(fp) as f:
-                output.append(f.read())
-        except FileNotFoundError:
-            output.append('')
-            logging.warning("FileNotFoundError: No such file: %r" % fp )
-
+    output = [_get_snippet(code, base) for code in code_list]
     return output
 
 
@@ -285,7 +288,7 @@ def correct(tokens, term_freq):
     return output, log
 
 
-def result_sort_key(response_item):
+def result_sort_key(tokens):
     """
     The sort key function for the search results
     Input:
@@ -293,20 +296,32 @@ def result_sort_key(response_item):
     output:
         sortable value, the greatest first
     """
-    code, snippet = response_item
+    def similarity(tokens, snippet):
+        target_tokens = lemmatize(tokenize(jinja2.filters.do_striptags(snippet)))
+        jaccard = len(set(tokens) & set(target_tokens)) / len(set(tokens) | set(target_tokens))
+        return jaccard
 
-    snippet_length = len(snippet)
-    freq = search_freq.get(code, 0)
-    beta = 0.05
-    score = len(code) - math.log(snippet_length) + math.log(freq * 0.05 + 1)
+    def raw_result_sort_key(response_item):
+        code, snippet = response_item
 
-    return score
+        snippet_length = len(snippet)
+        freq = search_freq.get(code, 0)
+        beta = 0.05
+        score = similarity(tokens, snippet)\
+                - math.log(len(code))\
+                - math.log(snippet_length)\
+                + math.log(freq * beta + 1)
+
+        return score
 
 
-def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
+def search(index, query, term_freq,
+        snippet_folder=SNIPPET_FOLDER,
+        hint_folder=HINT_FOLDER):
     """
     The highest level of search function
     """
+
     fallback_log = []
     code_list = []
     tokens = lemmatize(tokenize(query))
@@ -322,9 +337,9 @@ def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
         remove = tokens.pop()
         fallback_log.append(remove)
     snippets = get_snippets(code_list, snippet_folder)
-    hints, hint_scores = get_hints(code_list, current_tokens=tokens)
+    hints, hint_scores = get_hints(code_list, hint_folder=hint_folder, current_tokens=tokens)
     response = list(zip(code_list, snippets))
-    response.sort(key=result_sort_key, reverse=True)
+    response.sort(key=result_sort_key(tokens), reverse=True)
 
     # Count search_frequency
     if len(response) <= MAX_RESULT: # the respone can be shown in one page
@@ -334,7 +349,7 @@ def search(index, query, snippet_folder=SNIPPET_FOLDER, term_freq=term_freq):
 
     return response, tokens, hints, hint_scores, \
            abbr_log, correct_log, fallback_log
-           
+
 
 def main():
     import argparse

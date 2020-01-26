@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>{{ site_title }}</title>
+    <title>{{ site_title|striptags }}</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -43,13 +43,13 @@
   </head>
   <body>
     <div class="container">
-      <h1>{{ site_title }}</h1>
-      <p>{{ site_subtitle }}</p>
+      <h1>{{ site_title|safe }}</h1>
+      <p>{{ site_subtitle|safe }}</p>
       <p style="text-align: right;"><a style="color: lightgray; font-size: 0.8em" href="https://github.com/jeroyang/cateye">Powered by Cateye</a></p>
       <div id="search">
-        <div class="inner-addon right-addon" style="margin-top: 15px;margin-bottom: 15px;">
-          <i class="glyphicon glyphicon-search"></i>
-          <input type="text" name="query" id="inputbox" class="form-control" placeholder="Search" value="{{ query }}" />
+        <div class="form-group has-feedback">
+            <input type="text" class="form-control" id="inputbox" placeholder="Search" style="font-size: 1.2em; height:50px;"/>
+            <span class="glyphicon glyphicon-search form-control-feedback" style="margin: 10px;"></span>
         </div>
 
         <div class="response" id="response">
@@ -59,13 +59,13 @@
     </div>
     <script type="text/javascript">
      $('#inputbox').on('change', function(e) {
-       document.title = $(this).val() + ' - {{ site_title }} ';
+       document.title = $(this).val() + ' - {{ site_title|striptags }} ';
        $.get('/_search', {s: $(this).val()}, function(data) {
          $('#response').html(data);
        });
        var data = '?s=' + $(this).val();
        var href = window.location.protocol+'//'+window.location.hostname+(location.port ? ':'+window.location.port: '') + '/' + data;
-       history.pushState('',  $(this).val() + ' - {{ site_title }} ', href);
+       history.pushState('',  $(this).val() + ' - {{ site_title|striptags }} ', href);
      });
      $(document).on('touchstart', function() {
        documentClick = true;
@@ -98,7 +98,7 @@
      $(document).ready(function() {
        query = $('#inputbox').val();
        if (query != '') {
-         document.title = query + ' - {{ site_title }} ';
+         document.title = query + ' - {{ site_title|striptags }} ';
          $.get('/_search', {s: query}, function(data) {
            $('#response').html(data);
          });

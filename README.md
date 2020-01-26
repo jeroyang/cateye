@@ -24,7 +24,7 @@ $ pip install -e .
 
 ### 1. Run the Demo Site:
 ```bash
-$ FLASK_APP=app.py FLASK_ENV=development flask run
+$ FLASK_APP=application.py FLASK_ENV=development flask run
 ```
 Then browse the local site http://127.0.0.1:5000/
 Try to search "rhinitis"
