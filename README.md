@@ -62,7 +62,7 @@ This command read the files in the *token_folder* and build an on-disk index in 
 
 #### 2-4. Run your application:
 ```bash
-$ FLASK_APP=app.py FLASK_ENV=development flask run
+$ FLASK_APP=application.py FLASK_ENV=development flask run
 ```
 
 ## License
