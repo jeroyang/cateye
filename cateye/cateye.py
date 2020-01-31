@@ -313,7 +313,7 @@ def result_sort_key(tokens):
                 + math.log(freq * beta + 1)
 
         return score
-
+    return raw_result_sort_key
 
 def search(index, query, term_freq,
         snippet_folder=SNIPPET_FOLDER,
