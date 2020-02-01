@@ -16,7 +16,7 @@ if sys.argv[-1] == 'publish':
 
 setup(
     name='cateye',
-    version='0.4.3',
+    version='0.4.4',
     description="A hint-enabled search engine framework for biomedical classification systems",
     long_description=readme,
     long_description_content_type="text/markdown",
