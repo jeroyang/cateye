@@ -13,7 +13,6 @@ from shove import Shove
 
 import jinja2
 
-
 sys.path.append(os.getcwd())
 from constants import *
 
@@ -70,7 +69,6 @@ def gen_path(base, code):
 def clean(s):
     output = re.sub(r'without .*?(,|$)', '', s)
     return output
-
 
 def tokenize(s):
     """
@@ -324,11 +322,10 @@ def search(index, query, term_freq,
 
     fallback_log = []
     code_list = []
-    tokens = lemmatize(tokenize(query))
+    tokens = filterout(lemmatize(tokenize(query)))
     tokens, abbr_log = abbr_expand(tokens)
     tokens, correct_log = correct(tokens, term_freq)
     tokens = lemmatize(tokens)
-    tokens = filterout(tokens)
     while len(tokens) > 0: # Fallback mechanism
         code_list = fetch(index, tokens)
         if len(code_list) > 0:
@@ -344,7 +341,7 @@ def search(index, query, term_freq,
     # Count search_frequency
     if len(response) <= MAX_RESULT: # the respone can be shown in one page
         search_freq.update(code_list)
-        with open(SEARCH_FREQ_JSON, 'w', encoding="utf-8") as f:
+        with open(SEARCH_FREQ_JSON, 'w') as f:
             json.dump(search_freq, f, indent=2)
 
     return response, tokens, hints, hint_scores, \

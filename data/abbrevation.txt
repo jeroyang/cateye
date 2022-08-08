@@ -1,2 +1,2 @@
-NSD	nasal septal deviation
 HBV	hepatits B virus
+DM	diabetes mellitus
