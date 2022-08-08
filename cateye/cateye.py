@@ -7,9 +7,9 @@ import logging
 import string
 import random
 import json
+import shelve
 from collections import defaultdict, Counter
 from functools import lru_cache
-from shove import Shove
 
 import jinja2
 
@@ -97,16 +97,16 @@ def filterout(tokens, stopwords=STOPWORDS):
     return [token for token in tokens if token not in stopwords]
 
 
-def invert_index(source_dir, index_url=INDEX_URL, init=False):
+def invert_index(source_dir, index_fp=INDEX_FP, init=False):
     """
     Build the invert index from give source_dir
-    Output a Shove object built on the store_path
+    Output a shelve object built on the store_path
     Input:
         source_dir: a directory on the filesystem
-        index_url: the store_path for the Shove object
+        index_fp: the file path for the shelve object
         init: clear the old index and rebuild from scratch
     Output:
-        index: a Shove object
+        index: a shelve object
     """
     raw_index = defaultdict(list)
     for base, dir_list, fn_list in os.walk(source_dir):
@@ -121,14 +121,17 @@ def invert_index(source_dir, index_url=INDEX_URL, init=False):
                     continue
                 for token in tokens:
                     raw_index[token].append(code)
-    index = Shove(store=index_url)
+
     if init:
-        index.clear()
+        flag = 'n'
+    else:
+        flag = 'c'
+    index = shelve.open(index_fp, flag=flag)
+
     if '' in raw_index:
         del raw_index['']
     index.update(raw_index)
-    index.sync()
-    return index
+    index.close()
 
 
 def write_spelling(token_folder, spelling_file):
@@ -355,11 +358,11 @@ def main():
     args = parser.parse_args()
     if args.action == 'newindex':
         init = True
-        index = invert_index(TOKEN_FOLDER, INDEX_URL, init=init)
+        invert_index(TOKEN_FOLDER, INDEX_FP, init=init)
         write_spelling(TOKEN_FOLDER, SPELLING_FILE)
     elif args.action == 'updateindex':
         init = False
-        index = invert_index(TOKEN_FOLDER, INDEX_URL, init=init)
+        invert_index(TOKEN_FOLDER, INDEX_FP, init=init)
         write_spelling(TOKEN_FOLDER, SPELLING_FILE)
 
 if __name__ == '__main__':

@@ -13,8 +13,7 @@ SPELLING_FILE = 'data/spelling.txt' # The formal spelling of tokens
 ABBREVIATION_FILE = 'data/abbrevation.txt'
 SEARCH_FREQ_JSON = 'data/search_freq.json'
 
-INDEX_URL = 'file://index'
-
+INDEX_FP = 'index'
 MAX_HINT_SMAPLING_SIZE = 100 # smaller the size, faster the system, less accurate hint
 MAX_RESULT = 15 # The upper limit of the showing results
 

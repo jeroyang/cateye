@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import hashlib
+import shelve
 
 from flask import Flask, jsonify, render_template, request
 import cateye
@@ -8,8 +9,7 @@ from constants import *
 
 application = Flask(__name__)
 
-cm_index = cateye.Shove(INDEX_URL)
-
+cm_index = shelve.open(INDEX_FP)
 
 # Load spelling.txt
 term_freq = cateye.load_spelling(spell_file=SPELLING_FILE)
