@@ -9,5 +9,5 @@ MarkupSafe==2.1.1
 parse==1.19.0
 shove==0.6.6
 stuf==0.9.16
-Werkzeug==2.2.1
+Werkzeug==2.2.3
 zipp==3.8.1
