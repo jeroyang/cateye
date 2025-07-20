@@ -214,7 +214,6 @@ def _get_snippet(code, base):
         with open(fp, encoding="utf-8") as f:
             return f.read()
     except FileNotFoundError:
-        output.append('')
         logging.warning("FileNotFoundError: No such file: %r" % fp )
         return ''
 
