@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-import hashlib
 import shelve
 
 from flask import Flask, jsonify, render_template, request

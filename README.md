@@ -1,69 +1,102 @@
 # Cateye
 
-A hint-enabled search engine framework for biomedical classification systems
-
-[![Build Status](https://travis-ci.org/jeroyang/cateye.svg?branch=master)](https://travis-ci.org/jeroyang/cateye)
 [![](https://img.shields.io/pypi/v/cateye.svg)](https://pypi.python.org/pypi/cateye)
 
+Cateye is a Python framework for building real-time search engines over biomedical classification systems such as ICD-10, SNOMED CT, or any structured code set with human-readable descriptions.
+
+Clinicians and medical coders often need to look up a code from a vague or incomplete description — a drug name, a symptom, or an abbreviation. Cateye handles the messiness of natural clinical language: it corrects typos, expands abbreviations, recovers partial matches, and learns which codes are used most often to push relevant results to the top.
+
+The included demo runs against a set of ICD-10 respiratory codes. You can replace the data with any classification system and have a working search site in minutes.
+
 ## Features
-- Hint: Show hints for search terms which can narrow down the results fast.
-- Fallback: If no result satisfying the query, the system automatically eliminates less important search terms.
-- Spelling correction: Build-in spelling correction for query terms.
-- Abbreviation expansion: Pre-defined abbreviation list will be automatically applied during the search
-- Sorted results: Sort the results according to the search history.
+
+- **Interactive hints:** As results appear, Cateye suggests related terms you can click to refine the search — useful when you know the concept but not the exact wording.
+- **Graceful fallback:** When a multi-term query returns nothing, the least informative term is dropped automatically and the search retries, so users always see something useful.
+- **Spelling correction:** Misspelled query terms are corrected against a frequency-ranked vocabulary before searching.
+- **Abbreviation expansion:** A configurable abbreviation table maps short forms (e.g. "DM" → "diabetes mellitus") transparently during search.
+- **Frequency-ranked results:** Results are sorted by a score that combines term overlap and historical search frequency, so common codes surface first.
+- **CJK support:** The tokenizer handles mixed English and Chinese/Japanese/Korean text out of the box.
+
+## Requirements
+
+- Python 3.9+
 
 ## Installation
 
 ```bash
-$ git clone https://github.com/jeroyang/cateye.git
-$ cd cateye
-$ pip install -e .
+git clone https://github.com/jeroyang/cateye.git
+cd cateye
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
 ```
 
 ## Usage
 
-### 1. Run the Demo Site:
+### 1. Run the demo site
+
 ```bash
-$ FLASK_APP=application.py FLASK_ENV=development flask run
+python application.py
 ```
-Then browse the local site http://127.0.0.1:5000/
-Try to search "rhinitis"
 
-### 2. Make your own site:
+Then open http://127.0.0.1:5000/ and try searching for "rhinitis".
 
-#### 2-1. Check the constants.py:
-Setup the essential variables in the constants.py:
-*SITE_TITLE, SITE_SUBTITLE, TOKEN_FOLDER, SNIPPET_FOLDER, HINT_FOLDER, SPELLING_FILE, ABBREVIATION_FILE, INDEX_URL*
+### 2. Build your own site
 
-The *INDEX_URL* will be used in the Shove object, which can be a local URL starts with file:// please check the document of [Shove](https://pypi.org/project/shove/).
+#### 2-1. Configure constants.py
 
-#### 2-2. Data preparing
-Folders overview:
-  - *data:* The data source for the search engine, all information in this subfolders using the term id as their filenames
-  - *data/token:* The tokens of the documents, after lemmatization
-  - *data/snippet:* The HTML snippets of the documents, which will be shown on the search results
-  - *data/hint:* The hints for each entity
-  - *data/spelling.txt:* The formal spelling of your tokens (before normalization). If possible, sort the tokens with the frequency of usage, the most common word the first.
-  - *data/abbreviation.txt:* The abbreviations, one line for one abbreviation pair, using tab to separate the short form and long form
+Edit `constants.py` to set your paths and site metadata:
 
-Cateye include some very basic text processing tools:
-tokenizer (cateye.tokenize) and lemmatizer (cateye.lemmatize)
+| Variable | Description |
+|---|---|
+| `SITE_TITLE` | HTML title shown in the header |
+| `SITE_SUBTITLE` | Subtitle shown in the header |
+| `TOKEN_FOLDER` | Directory containing token files (one file per entity) |
+| `SNIPPET_FOLDER` | Directory containing HTML snippet files (one file per entity) |
+| `HINT_FOLDER` | Directory containing hint files (one file per entity) |
+| `SPELLING_FILE` | Path to the spelling reference file |
+| `ABBREVIATION_FILE` | Path to the abbreviation list file |
+| `INDEX_FP` | File path for the on-disk shelve index |
 
-The tokenize function will be used in two places: the first place is to cut your documents into tokens, and the second place is to cut your query into tokens.
+#### 2-2. Prepare your data
 
-The lemmatizing function will normalize your tokens. If you wish to build a case-insensitive search engine, you may use lowercase lemmatizer on the tokens.
+All data files use the entity's term ID as the filename.
 
-#### 2-3. Build the index:
-Run the command in the command line
-```bash
-$ cateye newindex
 ```
-This command read the files in the *token_folder* and build an on-disk index in the *index_url*. It takes time depending on the size of your data.
+data/
+├── token/          # Tokenized text for each entity (one token per line)
+├── snippet/        # HTML snippet shown in search results (one file per entity)
+├── hint/           # Related terms for hint suggestions (one per line)
+├── spelling.txt    # Reference vocabulary, sorted by frequency (most common first)
+└── abbrevation.txt # Abbreviation pairs: <short form><TAB><long form>, one per line
+```
 
-#### 2-4. Run your application:
+Cateye provides basic text processing utilities:
+
+- `cateye.tokenize(s)` — splits a string into tokens, handles hyphenated terms and CJK text
+- `cateye.lemmatize(tokens)` — lowercases tokens for case-insensitive matching
+
+Use these same functions when preprocessing your documents so that index and query tokens match.
+
+#### 2-3. Build the index
+
 ```bash
-$ FLASK_APP=application.py FLASK_ENV=development flask run
+cateye newindex
+```
+
+Reads all files in `TOKEN_FOLDER` and builds an on-disk index at `INDEX_FP`. To update an existing index without wiping it:
+
+```bash
+cateye updateindex
+```
+
+#### 2-4. Run your application
+
+```bash
+python application.py
 ```
 
 ## License
-* Free software: MIT license
+
+MIT
