@@ -163,7 +163,9 @@ def get_hints(code_list, k=10, hint_folder=HINT_FOLDER, current_tokens=None):
         current_tokens = []
 
     size = min(len(code_list), MAX_HINT_SMAPLING_SIZE)
-    sample = random.sample(code_list, size)
+    # random.sample() requires a sequence. fetch() returns a set, and
+    # Python 3.11+ rejects sets here (they were deprecated in 3.9).
+    sample = random.sample(tuple(code_list), size)
     hint_list = []
     capital_dict = {}
 
