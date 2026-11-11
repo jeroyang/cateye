@@ -37,6 +37,13 @@ class TestCateye(unittest.TestCase):
         result = cateye.filterout(tokens, stopwords)
         self.assertEqual(wanted, result)
 
+    def test_get_hints_accepts_set(self):
+        codes = {'J00', 'J30.0', 'J30.1', 'J30.2'}
+        hints, scores = cateye.get_hints(codes, k=5, hint_folder='data/hint')
+        self.assertIsInstance(hints, tuple)
+        self.assertIsInstance(scores, tuple)
+        self.assertEqual(len(hints), len(scores))
+
     def test_ed1(self):
         token = 'abc'
         wanted = {'aabc', 'abbc', 'acbc', 'adbc', 'aebc',
